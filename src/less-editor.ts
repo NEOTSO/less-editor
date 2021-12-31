@@ -34,11 +34,20 @@ export class LessEditor {
                     const anchorNode = this.sel?.anchorNode
                     const lineNum = this.getLineNum(this.el?.childNodes as NodeList, anchorNode as Text)
                     console.log(anchorNode)
-                    anchorNode?.insertData(anchorOffset, tabSpace)
-                    setTimeout(() => {
-                        range.setStart(anchorNode as Node, anchorOffset + this.tabWidth)
-                        range.setEnd(anchorNode as Node, anchorOffset + this.tabWidth)
-                    }, 0)
+                    console.log(anchorNode?.nodeType)
+                    if (anchorNode?.nodeType === Node.ELEMENT_NODE) {
+                        const textNode = document.createTextNode(tabSpace)
+                        console.log(anchorNode.childNodes)
+                        anchorNode.replaceChild(textNode, anchorNode.childNodes[0])
+                        range.setStart(textNode, this.tabWidth)
+                        range.setEnd(textNode, this.tabWidth)
+                    } else if (anchorNode?.nodeType === Node.TEXT_NODE) {
+                        anchorNode?.insertData(anchorOffset, tabSpace)
+                        setTimeout(() => {
+                            range.setStart(anchorNode as Node, anchorOffset + this.tabWidth)
+                            range.setEnd(anchorNode as Node, anchorOffset + this.tabWidth)
+                        }, 0)
+                    }
                 }
             }
         })
