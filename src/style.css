@@ -1,0 +1,10 @@
+.editor {
+    width: 800px;
+    height: 80vh;
+    margin: 0 auto;
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+    outline: none;
+    border-radius: 5px;
+}
