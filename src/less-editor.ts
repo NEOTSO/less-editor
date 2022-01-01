@@ -50,19 +50,26 @@ export class LessEditor {
                 range.setStart(anchorNode as Node, anchorOffset + this.tabWidth)
                 range.setEnd(anchorNode as Node, anchorOffset + this.tabWidth)
             }
+        } else {
+            const anchorOffset = this.sel?.anchorOffset
+            const anchorNode = this.sel?.anchorNode
+            console.log(anchorNode)
+            anchorNode?.insertData(0, tabSpace);
         }
     }
 
     tabIndentReverse() {
         const tabSpace = new Array(this.tabWidth).fill('\u00A0').join('')
-        if (this.sel?.isCollapsed) {
-            const anchorOffset = this.sel?.anchorOffset
-            const anchorNode = this.sel?.anchorNode
-            if (anchorNode?.nodeType === Node.TEXT_NODE) {
-                const result = anchorNode.nodeValue?.match(/^\s{1,4}/)
-                if (result) {
-                    anchorNode.deleteData(0, result[0].length)
-                }
+        // if (this.sel?.isCollapsed) {
+
+        // }
+
+        const anchorOffset = this.sel?.anchorOffset
+        const anchorNode = this.sel?.anchorNode
+        if (anchorNode?.nodeType === Node.TEXT_NODE) {
+            const result = anchorNode.nodeValue?.match(/^\s{1,4}/)
+            if (result) {
+                anchorNode.deleteData(0, result[0].length)
             }
         }
     }
