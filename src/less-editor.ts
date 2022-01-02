@@ -25,16 +25,15 @@ export class LessEditor {
             if (e.key === 'Tab') {
                 e.preventDefault()
                 if (e.shiftKey) {
-                    this.tabIndentReverse()
+                    this.reTab()
                 } else {
-                    this.tabIndent()
+                    this.tab()
                 }
-
             }
         })
     }
 
-    tabIndent() {
+    tab() {
         const range = this.sel?.getRangeAt(0)
         if (this.sel?.isCollapsed) {
             const anchorOffset = this.sel?.anchorOffset
@@ -67,6 +66,47 @@ export class LessEditor {
         }
     }
 
+    reTab() {
+        const anchorNode = this.sel?.anchorNode
+        const focusNode = this.sel?.focusNode
+        if (this.sel?.isCollapsed) {
+            if (anchorNode?.nodeType === Node.TEXT_NODE) {
+                const result = anchorNode.nodeValue?.match(/^\s{1,4}/)
+                if (result) {
+                    anchorNode.deleteData(0, result[0].length)
+                }
+            }
+        } else {
+            var reTabNodeList: Set<Node> = new Set()
+            reTabNodeList.add(anchorNode as Node)
+            reTabNodeList.add(focusNode as Node)
+            this.el?.childNodes.forEach(item => {
+                if (this.sel?.containsNode(item)) {
+                    reTabNodeList.add(item)
+                }
+            });
+            const result: Boolean = [...reTabNodeList].every(item => {
+                if (item.nodeType === Node.TEXT_NODE) {
+                    return this.isTextNodeStartWithTabSpace(item as Text)
+                } else if (item.nodeType === Node.ELEMENT_NODE) {
+                    if (item.childNodes[0].nodeType === Node.TEXT_NODE) {
+                        return this.isTextNodeStartWithTabSpace(item.childNodes[0] as Text)
+                    }
+                }
+                return false
+            })
+            if (result) {
+                [...reTabNodeList].forEach(item => {
+                    this.reIndentNode(item as Node)
+                })
+            }
+        }
+    }
+
+    isTextNodeStartWithTabSpace(node: Text) {
+        return node.nodeValue?.match(/^\s{4}/)
+    }
+
     indentNode(node: Node) {
         if (node.nodeType === Node.TEXT_NODE) {
             node.insertData(0, this.tabSpace)
@@ -80,14 +120,20 @@ export class LessEditor {
         }
     }
 
-    tabIndentReverse() {
-        const anchorOffset = this.sel?.anchorOffset
-        const anchorNode = this.sel?.anchorNode
-        if (anchorNode?.nodeType === Node.TEXT_NODE) {
-            const result = anchorNode.nodeValue?.match(/^\s{1,4}/)
-            if (result) {
-                anchorNode.deleteData(0, result[0].length)
+    reIndentNode(node: Node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            this.reIndentTextNode(node as Text)
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.childNodes[0].nodeType === Node.TEXT_NODE) {
+                this.reIndentTextNode(node.childNodes[0] as Text)
             }
+        }
+    }
+
+    reIndentTextNode(node: Text) {
+        const result = node.nodeValue?.match(/^\s{1,4}/)
+        if (result) {
+            node.deleteData(0, result[0].length)
         }
     }
 
