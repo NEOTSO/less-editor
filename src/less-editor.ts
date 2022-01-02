@@ -18,6 +18,7 @@ export class LessEditor {
 
     init() {
         this.listenIndent()
+        this.listenDropImage()
     }
 
     listenIndent() {
@@ -29,6 +30,37 @@ export class LessEditor {
                 } else {
                     this.tab()
                 }
+            }
+        })
+    }
+
+    listenDropImage() {
+        this.el?.addEventListener('dragenter', (e) => {
+            e.preventDefault()
+            this.el?.classList.add('drag-enter')
+        })
+
+        this.el?.addEventListener('dragleave', (e) => {
+            e.preventDefault()
+            this.el?.classList.remove('drag-enter')
+            console.log(e)
+        })
+
+        this.el?.addEventListener('drop', (e) => {
+            e.preventDefault()
+            this.el?.classList.remove('drag-enter')
+            console.log(this.sel)
+            const text = '![image](http://www.google.com)'
+            const element = document.createElement('div')
+            const textNode = document.createTextNode(text)
+            element.appendChild(textNode)
+            if (this.sel?.type === 'None') {
+                this.el?.appendChild(element);
+            } else {
+                const range = this.sel?.getRangeAt(0) as Range
+                this.el?.insertBefore(element, range.endContainer.nextSibling);
+                range.setStart(textNode, text.length)
+                range.setEnd(textNode, text.length)
             }
         })
     }
